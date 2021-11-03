@@ -15,8 +15,6 @@ from pathlib import Path
 
 dotenv.load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-import environ
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -27,7 +25,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
@@ -42,8 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # additional frameworks
     'rest_framework',
 
+    # apps
+    'apps.users',
 ]
 
 MIDDLEWARE = [
@@ -86,8 +87,14 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
+        'HOST': 'localhost',
         'PORT': os.getenv('DB_PORT'),
+        'TEST': {
+            'HOST': 'localhost',
+            'PORT': 5432,
+            'NAME': 'api_wallet_test_db',
+            'USER': 'api_wallet',
+        }
     }
 }
 
@@ -110,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+AUTH_USER_MODEL = 'users.User'
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 

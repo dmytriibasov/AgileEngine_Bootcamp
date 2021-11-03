@@ -6,9 +6,9 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=DB_NAME
-      - POSTGRES_USER=DB_USER
-      - POSTGRES_PASSWORD=DB_PASSWORD
+      - POSTGRES_DB=api_wallet
+      - POSTGRES_USER=api_wallet
+      - POSTGRES_PASSWORD=api_wallet
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
