@@ -18,3 +18,4 @@ class SignUpView(generics.CreateAPIView):
 
 
 
+

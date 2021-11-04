@@ -11,7 +11,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'password', 'password2', 'first_name', 'last_name', 'birth_date']
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True, 'style': {'input_type': 'password'}}
         }
 
     def save(self):
