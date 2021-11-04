@@ -21,6 +21,10 @@ class User(AbstractUser):
         null=False,
     )
 
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -28,3 +32,4 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
