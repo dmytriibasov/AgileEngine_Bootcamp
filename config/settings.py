@@ -42,10 +42,21 @@ INSTALLED_APPS = [
 
     # additional frameworks
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 
     # apps
     'apps.users',
 ]
+
+# REST Framework additions
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
