@@ -8,16 +8,17 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
+from .permissions import NotAuthenticated
 from .serializers import SignUpSerializer, LogOutSerializer
 
 
 class SignUpView(generics.CreateAPIView):
+    permission_classes = (NotAuthenticated, )
     queryset = User.objects.all()
     serializer_class = SignUpSerializer
 
 
 class LogOutView(APIView):
-
     serializer_class = LogOutSerializer
     permission_classes = (IsAuthenticated, )
 
@@ -28,12 +29,6 @@ class LogOutView(APIView):
         serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-        # try:
-        #     refresh_token = request.data['refresh']
-        #     token = RefreshToken(refresh_token)
-        #     token.blacklist()
-        # except Exception as e:
-        #     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class HelloWorldView(APIView):
