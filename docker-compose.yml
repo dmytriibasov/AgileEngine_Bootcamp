@@ -17,14 +17,6 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
-    environment:
-      - DEBUG=True
-      - DJANGO_SECRET_KEY=$i*2d4df+b_*d2o@)865+lrns5&h3lr+_c^i#b!y7bha%bi4n3
-      - DB_NAME=api_wallet
-      - DB_USER=api_wallet
-      - DB_PASSWORD=api_wallet
-      - DB_HOST=db
-      - DB_PORT=5432
     ports:
       - "8000:8000"
     depends_on:
