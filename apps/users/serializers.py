@@ -58,3 +58,9 @@ class LogOutSerializer(serializers.Serializer):
 
         except TokenError:
             self.fail('bad_token')
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
