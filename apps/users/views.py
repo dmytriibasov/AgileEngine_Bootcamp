@@ -13,12 +13,18 @@ from .serializers import SignUpSerializer, LogOutSerializer
 
 
 class SignUpView(generics.CreateAPIView):
+    """
+    View for signing up.
+    """
     permission_classes = (NotAuthenticated, )
     queryset = User.objects.all()
     serializer_class = SignUpSerializer
 
 
 class LogOutView(APIView):
+    """
+    View for logging out.
+    """
     serializer_class = LogOutSerializer
     permission_classes = (IsAuthenticated, )
 
@@ -32,6 +38,9 @@ class LogOutView(APIView):
 
 
 class HelloWorldView(APIView):
+    """
+    Test view to display 'Hello World' message.
+    """
     permission_classes = (IsAuthenticated, )
 
     def get(self, request):

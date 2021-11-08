@@ -6,7 +6,9 @@ from .managers import CustomUserManager
 
 # Create your models here.
 class User(AbstractUser):
-
+    """
+    Redefined default Django UserModel. Username field is not required anymore, only email instead.
+    """
     username = None
 
     birth_date = models.DateField(

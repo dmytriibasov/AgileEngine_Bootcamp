@@ -5,7 +5,9 @@ from .models import User
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for signing up.
+    """
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
     class Meta:
@@ -34,7 +36,9 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class LogOutSerializer(serializers.Serializer):
-
+    """
+    Serializer to blacklist refresh token while logging out.
+    """
     refresh = serializers.CharField()
 
     default_error_messages = {
