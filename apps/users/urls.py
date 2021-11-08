@@ -7,10 +7,9 @@ app_name = 'users'
 
 
 urlpatterns = [
-    path('signup/', SignUpView.as_view()),
+    path('signup/', SignUpView.as_view(), name='signup'),
     path('login/', jwt_views.TokenObtainPairView.as_view(), name='login'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('logout/', LogOutView.as_view(), name='logout'),
     path('hello/', HelloWorldView.as_view(), name='hello'),
 ]
-
