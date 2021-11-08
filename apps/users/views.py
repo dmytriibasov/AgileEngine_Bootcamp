@@ -28,7 +28,7 @@ class LogOutView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(data={'Logged out'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class HelloWorldView(APIView):
