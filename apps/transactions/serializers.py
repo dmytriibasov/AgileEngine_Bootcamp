@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Transaction
 
 
-class TransactionSerializer(serializers.ModelSerializer):
+class FillTransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
@@ -12,3 +12,10 @@ class TransactionSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("Value must be greater than 0.")
         return value
+
+
+class WithdrawTransactionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Transaction
+        field = ['value']
