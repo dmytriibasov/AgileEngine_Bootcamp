@@ -13,9 +13,14 @@ class FillTransactionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Value must be greater than 0.")
         return value
 
+#
+# class WithdrawTransactionSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = Transaction
+#         field = ['value']
 
-class WithdrawTransactionSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Transaction
-        field = ['value']
+    # def validate_value(self, value):
+    #     if value <= 0:
+    #         raise serializers.ValidationError("Value must be greater than 0.")
+    #     return value
