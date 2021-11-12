@@ -36,7 +36,7 @@ class Transaction(models.Model):
         auto_now_add=True,
     )
 
-    receiver = models.ForeignKey(
+    contact = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
