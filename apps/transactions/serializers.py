@@ -38,11 +38,14 @@ class WithdrawTransactionSerializer(serializers.ModelSerializer):
 
 class PayTransactionSerializer(serializers.ModelSerializer):
 
-    email = serializers.EmailField()
+    email = serializers.EmailField(write_only=True)
+    contact_email = serializers.EmailField(source='contact', read_only=True)
 
     class Meta:
         model = Transaction
-        fields = ['value']
+        fields = ['value', 'email', 'contact_email']
+
+
 
     def validate_value(self, value):
         if value <= 0:
