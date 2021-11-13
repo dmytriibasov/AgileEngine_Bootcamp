@@ -1,2 +1,2 @@
 Database diagram
-![](../../../Pictures/Bootcamp/DB_Schema.png)
+![](DB_Schema.png)
