@@ -101,13 +101,13 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT'),
-        'TEST': {
-            'HOST': 'localhost',
-            'PORT': 5432,
-            'NAME': 'api_wallet_test_db',
-            'USER': 'api_wallet',
-            'PASSWORD': 'api_wallet'
-        }
+        # 'TEST': {
+        #     'HOST': 'localhost',
+        #     'PORT': 5432,
+        #     'NAME': 'api_wallet_test_db',
+        #     'USER': 'api_wallet',
+        #     'PASSWORD': 'api_wallet'
+        # }
     }
 }
 
