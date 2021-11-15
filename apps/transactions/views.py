@@ -1,13 +1,13 @@
-from django.db import transaction
+import datetime
 from django.db.models import F
-from rest_framework import status
-from rest_framework.generics import CreateAPIView, GenericAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 from .mixins import CreateModelTransactionMixin
 from .models import Transaction
-from .serializers import FillTransactionSerializer, WithdrawTransactionSerializer, PayTransactionSerializer
+from .serializers import FillTransactionSerializer, WithdrawTransactionSerializer, PayTransactionSerializer,\
+    TransactionSerializer
 from ..users.models import User
 from ..wallets.models import Wallet
 
@@ -74,3 +74,20 @@ class PayTransactionView(CreateModelTransactionMixin, GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+
+class TransactionsListView(ListAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TransactionSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = user.transactions.all()
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date', datetime.datetime.today())
+        if start_date and end_date:
+            queryset = queryset.filter(date__gte=start_date).filter(date__lte=end_date)
+        elif end_date:
+            queryset = queryset.filter(date__lte=end_date)
+        return queryset.order_by('id')

@@ -45,8 +45,6 @@ class PayTransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = ['value', 'email', 'contact_email']
 
-
-
     def validate_value(self, value):
         if value <= 0:
             raise serializers.ValidationError("Value must be greater than 0.")
@@ -71,3 +69,11 @@ class PayTransactionSerializer(serializers.ModelSerializer):
         if attrs['value'] > balance:
             raise serializers.ValidationError('Transaction is not possible. Insufficient balance.')
         return attrs
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Transaction
+        fields = ['date', 'value', 'type']
+        read_only_fields = fields
