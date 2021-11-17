@@ -11,9 +11,9 @@ app_name = 'transactions'
 # router.register('', TransactionModelViewSet, basename='')
 
 urlpatterns = [
-    path('fill/', FillTransactionView.as_view(), name='transaction-fill'),
-    path('withdraw/', WithdrawTransactionView.as_view(), name='transaction-withdraw'),
-    path('pay/', PayTransactionView.as_view(), name='transaction-pay'),
-    path('', TransactionsListView.as_view(), name='transactions-list'),
+    path('fill/', FillTransactionView.as_view(), name='fill'),
+    path('withdraw/', WithdrawTransactionView.as_view(), name='withdraw'),
+    path('pay/', PayTransactionView.as_view(), name='pay'),
+    path('', TransactionsListView.as_view(), name='list'),
 ]
 

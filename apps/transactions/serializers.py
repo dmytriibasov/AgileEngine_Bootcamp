@@ -27,7 +27,7 @@ class WithdrawTransactionSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        user = self.context['request'].user
+        user = self.context.get('request').user
         wallet = user.wallets.get(id=user.id)
         balance = wallet.balance
 
