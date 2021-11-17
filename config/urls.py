@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('apps.users.urls', namespace='users')),
     path('transactions/', include('apps.transactions.urls', namespace='transactions')),
+    path('', include('apps.wallets.urls', namespace='wallets'))
 ]
 
 urlpatterns += doc_urls
