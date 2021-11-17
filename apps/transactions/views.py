@@ -85,8 +85,7 @@ class TransactionsListView(ListAPIView):
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date', datetime.datetime.today())
         if start_date and end_date:
-            queryset = queryset.filter(date__gte=start_date,
-                                       date__lte=end_date)
+            queryset = queryset.filter(date__range=(start_date, end_date))
         elif end_date:
             queryset = queryset.filter(date__lte=end_date)
         return queryset.order_by('id')

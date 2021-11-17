@@ -8,7 +8,7 @@ from django.db.models import Sum, Q
 
 class TransactionQuerySet(models.QuerySet):
 
-    def transactions_summary(self, start_date=None, end_date=datetime.today()):
+    def transactions_summary(self):
 
         return self.aggregate(
             filled=(
@@ -24,6 +24,22 @@ class TransactionQuerySet(models.QuerySet):
                 Sum('value', filter=Q(type=Transaction.MADE))
             ),
         )
+
+    def transactions_series(self):
+        return self.values('date').annotate(
+            filled=(
+                Sum('value', filter=Q(type=Transaction.FILL))
+            ),
+            withdrawn=(
+                Sum('value', filter=Q(type=Transaction.WITHDRAW))
+            ),
+            payments_received=(
+                Sum('value', filter=Q(type=Transaction.RECEIVED))
+            ),
+            payments_made=(
+                Sum('value', filter=Q(type=Transaction.MADE))
+            ),
+        ).order_by('date')
 
 
 # Create your models here.
