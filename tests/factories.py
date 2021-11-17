@@ -29,6 +29,6 @@ class WalletFactory(factory.django.DjangoModelFactory):
 class TransactionFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
-
+    wallet = factory.SubFactory(WalletFactory)
     class Meta:
         model = Transaction
