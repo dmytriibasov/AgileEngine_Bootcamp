@@ -1,11 +1,32 @@
+from datetime import datetime
+
 from django.db import models
 from config import settings
+from apps.wallets.models import Wallet
+from django.db.models import Sum, Q
+
+
+class TransactionQuerySet(models.QuerySet):
+
+    def transactions_summary(self, start_date=None, end_date=datetime.today()):
+
+        return self.aggregate(
+            filled=(
+                Sum('value', filter=Q(type=Transaction.FILL))
+            ),
+            withdrawn=(
+                Sum('value', filter=Q(type=Transaction.WITHDRAW))
+            ),
+            payments_received=(
+                Sum('value', filter=Q(type=Transaction.RECEIVED))
+            ),
+            payments_made=(
+                Sum('value', filter=Q(type=Transaction.MADE))
+            ),
+        )
 
 
 # Create your models here.
-from apps.wallets.models import Wallet
-
-
 class Transaction(models.Model):
 
     FILL = 'FILL'
@@ -47,6 +68,8 @@ class Transaction(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+
+    objects = TransactionQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'Transaction'
