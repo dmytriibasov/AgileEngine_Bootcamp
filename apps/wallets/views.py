@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Wallet
-from .serializers import WalletSerializer, SummarySerializer
+from .serializers import WalletSerializer, SummarySerializer, SeriesSerializer
 
 
 # Create your views here.
@@ -34,8 +34,7 @@ class SummaryView(APIView):
         end_date = self.request.query_params.get('end_date', datetime.datetime.today())
 
         if start_date and end_date:
-            queryset = request.user.transactions.filter(date__gte=start_date,
-                                                        date__lte=end_date).transactions_summary()
+            queryset = request.user.transactions.filter(date__range=(start_date, end_date)).transactions_summary()
         elif end_date:
             queryset = request.user.transactions.filter(date__lte=end_date).transactions_summary()
         else:
@@ -45,3 +44,30 @@ class SummaryView(APIView):
         serializer = SummarySerializer(instance=data)
         return Response(data=serializer.data)
 
+
+class SeriesView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date', datetime.datetime.today())
+
+        if start_date and end_date:
+            queryset = request.user.transactions.filter(date__range=(start_date, end_date)).transactions_series()
+        elif end_date:
+            queryset = request.user.transactions.filter(date__lte=end_date).transactions_series()
+        else:
+            queryset = request.user.transactions.transactions_series()
+
+        data = {}
+        for query in queryset:
+            for key in query:
+                data[key] = []
+
+        for query in queryset:
+            for key, value in query.items():
+                data[key].append(value)
+
+        serializer = SeriesSerializer(instance=data)
+        return Response(data=serializer.data)
