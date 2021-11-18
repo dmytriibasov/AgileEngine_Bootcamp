@@ -26,6 +26,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='secret_key228')
 
+# Currency exchange API settings
+CURRENCY_EXCHANGE_APP_ID = os.getenv('OPEN_EXCHANGE_RATE_API_ID')
+CURRENCY_EXCHANGE_URL = 'https://openexchangerates.org/api/latest.json'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -111,6 +114,16 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "virtual_wallet_cache"
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

@@ -7,21 +7,37 @@ from rest_framework.views import APIView
 
 from .models import Wallet
 from .serializers import WalletSerializer, SummarySerializer, SeriesSerializer
+from .services import CurrencyConverter
 
 
 # Create your views here.
-class WalletView(RetrieveAPIView):
+# class WalletView(RetrieveAPIView):
+#
+#     permission_classes = (IsAuthenticated,)
+#     serializer_class = WalletSerializer
+#     queryset = Wallet.objects.all()
+#
+#     def get_object(self):
+#         queryset = self.filter_queryset(self.get_queryset())
+#         obj = queryset.get(pk=self.request.user.id)
+#         self.check_object_permissions(self.request, obj)
+#
+#         return obj
+
+class WalletView(APIView):
 
     permission_classes = (IsAuthenticated,)
-    serializer_class = WalletSerializer
-    queryset = Wallet.objects.all()
 
-    def get_object(self):
-        queryset = self.filter_queryset(self.get_queryset())
-        obj = queryset.get(pk=self.request.user.id)
-        self.check_object_permissions(self.request, obj)
+    def get(self, request):
+        wallet = Wallet.objects.get(id=self.request.user.id)
+        currency_converter = CurrencyConverter(currency=self.request.query_params.get('currency', wallet.currency),
+                                               base_currency=wallet.currency)
 
-        return obj
+        data = {
+            'balance': currency_converter.converted_amount(wallet.balance)
+        }
+        serializer = WalletSerializer(instance=data)
+        return Response(data=serializer.data)
 
 
 class SummaryView(APIView):
@@ -30,17 +46,21 @@ class SummaryView(APIView):
 
     def get(self, request):
 
+        wallet = Wallet.objects.get(id=self.request.user.id)
+        currency_converter = CurrencyConverter(currency=self.request.query_params.get('currency', wallet.currency),
+                                               base_currency=wallet.currency)
+
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date', datetime.datetime.today())
 
         if start_date and end_date:
             queryset = request.user.transactions.filter(date__range=(start_date, end_date)).transactions_summary()
-        elif end_date:
-            queryset = request.user.transactions.filter(date__lte=end_date).transactions_summary()
         else:
-            queryset = request.user.transactions.transactions_summary()
+            queryset = request.user.transactions.filter(date__lte=end_date).transactions_summary()
 
-        data = {key: value for key, value in queryset.items()}
+        data = {key: (value if not value else currency_converter.converted_amount(value))
+                for key, value in queryset.items()}
+
         serializer = SummarySerializer(instance=data)
         return Response(data=serializer.data)
 
@@ -55,19 +75,26 @@ class SeriesView(APIView):
 
         if start_date and end_date:
             queryset = request.user.transactions.filter(date__range=(start_date, end_date)).transactions_series()
-        elif end_date:
-            queryset = request.user.transactions.filter(date__lte=end_date).transactions_series()
         else:
-            queryset = request.user.transactions.transactions_series()
+            queryset = request.user.transactions.filter(date__lte=end_date).transactions_series()
+            print(f'{queryset}')
+
 
         data = {}
         for query in queryset:
             for key in query:
                 data[key] = []
 
+        wallet = Wallet.objects.get(id=self.request.user.id)
+        currency_converter = CurrencyConverter(currency=self.request.query_params.get('currency', wallet.currency),
+                                               base_currency=wallet.currency)
+
         for query in queryset:
             for key, value in query.items():
-                data[key].append(value)
+                if key == 'date' or not value:
+                    data[key].append(value)
+                else:
+                    data[key].append(currency_converter.converted_amount(value))
 
         serializer = SeriesSerializer(instance=data)
         return Response(data=serializer.data)

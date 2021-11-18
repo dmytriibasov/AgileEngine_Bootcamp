@@ -4,7 +4,7 @@ from django.db import models
 from config import settings
 from apps.wallets.models import Wallet
 from django.db.models import Sum, Q
-
+from django.db.models.functions import Coalesce
 
 class TransactionQuerySet(models.QuerySet):
 
@@ -12,32 +12,32 @@ class TransactionQuerySet(models.QuerySet):
 
         return self.aggregate(
             filled=(
-                Sum('value', filter=Q(type=Transaction.FILL))
+                Coalesce(Sum('value', filter=Q(type=Transaction.FILL)), 0)
             ),
             withdrawn=(
-                Sum('value', filter=Q(type=Transaction.WITHDRAW))
+                Coalesce(Sum('value', filter=Q(type=Transaction.WITHDRAW)), 0)
             ),
             payments_received=(
-                Sum('value', filter=Q(type=Transaction.RECEIVED))
+                Coalesce(Sum('value', filter=Q(type=Transaction.RECEIVED)), 0)
             ),
             payments_made=(
-                Sum('value', filter=Q(type=Transaction.MADE))
+                Coalesce(Sum('value', filter=Q(type=Transaction.MADE)), 0)
             ),
         )
 
     def transactions_series(self):
         return self.values('date').annotate(
             filled=(
-                Sum('value', filter=Q(type=Transaction.FILL))
+                Coalesce(Sum('value', filter=Q(type=Transaction.FILL)), 0)
             ),
             withdrawn=(
-                Sum('value', filter=Q(type=Transaction.WITHDRAW))
+                Coalesce(Sum('value', filter=Q(type=Transaction.WITHDRAW)), 0)
             ),
             payments_received=(
-                Sum('value', filter=Q(type=Transaction.RECEIVED))
+                Coalesce(Sum('value', filter=Q(type=Transaction.RECEIVED)), 0)
             ),
             payments_made=(
-                Sum('value', filter=Q(type=Transaction.MADE))
+                Coalesce(Sum('value', filter=Q(type=Transaction.MADE)), 0)
             ),
         ).order_by('date')
 
