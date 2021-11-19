@@ -1,2 +1,2 @@
 # Database diagram
-![](DB_Schema.png)
+![](DER_v2.png)
