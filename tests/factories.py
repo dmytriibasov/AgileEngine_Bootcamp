@@ -6,13 +6,14 @@ from config import settings
 
 from apps.transactions.models import Transaction
 from apps.wallets.models import Wallet
+from django.test.client import RequestFactory
 
 
 class UserFactory(factory.django.DjangoModelFactory):
 
-    email = factory.LazyAttribute(lambda a: f'{a.first_name}.{a.last_name}@example.com'.lower())
-    first_name = fuzzy.FuzzyText(length=12, chars=string.ascii_letters, prefix='')
-    last_name = fuzzy.FuzzyText(length=12, chars=string.ascii_letters, prefix='')
+    # email = factory.LazyAttribute(lambda a: f'{a.first_name}.{a.last_name}@example.com'.lower())
+    # first_name = fuzzy.FuzzyText(length=12, chars=string.ascii_letters, prefix='')
+    # last_name = fuzzy.FuzzyText(length=12, chars=string.ascii_letters, prefix='')
 
     class Meta:
         model = settings.AUTH_USER_MODEL
@@ -30,5 +31,6 @@ class TransactionFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     wallet = factory.SubFactory(WalletFactory)
+
     class Meta:
         model = Transaction
