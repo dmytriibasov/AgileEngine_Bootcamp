@@ -1,29 +1,13 @@
 import datetime
-
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from .models import Wallet
 from .serializers import WalletSerializer, SummarySerializer, SeriesSerializer
 from .services import CurrencyConverter
 
 
 # Create your views here.
-# class WalletView(RetrieveAPIView):
-#
-#     permission_classes = (IsAuthenticated,)
-#     serializer_class = WalletSerializer
-#     queryset = Wallet.objects.all()
-#
-#     def get_object(self):
-#         queryset = self.filter_queryset(self.get_queryset())
-#         obj = queryset.get(pk=self.request.user.id)
-#         self.check_object_permissions(self.request, obj)
-#
-#         return obj
-
 class WalletView(APIView):
 
     permission_classes = (IsAuthenticated,)
@@ -58,8 +42,7 @@ class SummaryView(APIView):
         else:
             queryset = request.user.transactions.filter(date__lte=end_date).transactions_summary()
 
-        data = {key: (value if not value else currency_converter.converted_amount(value))
-                for key, value in queryset.items()}
+        data = {key: currency_converter.converted_amount(value) for key, value in queryset.items()}
 
         serializer = SummarySerializer(instance=data)
         return Response(data=serializer.data)
@@ -77,24 +60,21 @@ class SeriesView(APIView):
             queryset = request.user.transactions.filter(date__range=(start_date, end_date)).transactions_series()
         else:
             queryset = request.user.transactions.filter(date__lte=end_date).transactions_series()
-            print(f'{queryset}')
-
-
-        data = {}
-        for query in queryset:
-            for key in query:
-                data[key] = []
 
         wallet = Wallet.objects.get(id=self.request.user.id)
         currency_converter = CurrencyConverter(currency=self.request.query_params.get('currency', wallet.currency),
                                                base_currency=wallet.currency)
+        data = {}
+
+        for query in queryset:
+            for key in query:
+                data[key] = []
 
         for query in queryset:
             for key, value in query.items():
-                if key == 'date' or not value:
+                if key == 'date':
                     data[key].append(value)
-                else:
-                    data[key].append(currency_converter.converted_amount(value))
+                data[key].append(currency_converter.converted_amount(value))
 
         serializer = SeriesSerializer(instance=data)
         return Response(data=serializer.data)
