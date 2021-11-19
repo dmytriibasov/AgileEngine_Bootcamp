@@ -1,5 +1,5 @@
 import pytest
-
+from django.test import TestCase
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
@@ -8,13 +8,15 @@ from apps.transactions.models import Transaction
 from tests.factories import TransactionFactory, WalletFactory, UserFactory
 
 
-class TestTransactionApi:
-    client = APIClient()
+class TestTransactionApiView(TestCase):
 
-    @pytest.mark.django_db
+    def setUp(self) -> None:
+
+        self.client = APIClient()
+
+    # @pytest.mark.django_db
     def test_transaction_fill(self):
         user = UserFactory()
-        wallet = WalletFactory(user=user)
         self.client.force_login(user=user)
 
         data = {
@@ -24,20 +26,15 @@ class TestTransactionApi:
         response = self.client.post(reverse('transactions:fill'), data=data)
 
         assert response.status_code == 201
-        # wallet.refresh_from_db()
-        # assert wallet.balance == data['value']   ????
 
-    # @pytest.mark.django_db
     # def test_transaction_withdraw(self):
-    #     user = UserFactory()
-    #     wallet = WalletFactory(user=user, balance=200)
-    #     self.client.force_login(user=user)
-    #     print(f'BALANCE: {wallet.balance}')
+    #     user2 = UserFactory()
+    #     wallet2 = WalletFactory(user=user2, balance=200)
+    #     self.client.force_login(user=user2)
+    #
+    #     print(f'BALANCE: {wallet2.balance} ID: {wallet2.id}')
     #     data = {
     #         'value': 100,
-    #         # 'user': user,
-    #         # 'type': Transaction.WITHDRAW,
-    #         # 'wallet': wallet
     #     }
     #
     #     response = self.client.post(reverse('transactions:withdraw'), data=data)
