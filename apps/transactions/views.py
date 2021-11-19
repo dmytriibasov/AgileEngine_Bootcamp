@@ -52,7 +52,7 @@ class PayTransactionView(CreateModelTransactionMixin, GenericAPIView):
 
         # Sender & Receiver users
         sender = self.request.user
-        receiver = User.objects.get(email=serializer.validated_data.pop('email'))
+        receiver = User.objects.get(email=serializer.validated_data.get('email'))
 
         # Sender wallet
         sender_wallet = Wallet.objects.get(id=sender.id)  # TEMPORARY HARDCODED wallet_id == user_id !! TO BE CHANGED
@@ -65,10 +65,10 @@ class PayTransactionView(CreateModelTransactionMixin, GenericAPIView):
         receiver_wallet.save(update_fields=['balance'])
 
         # Transaction MADE
-        serializer.save(user=sender, type=Transaction.MADE, wallet_id=sender_wallet.id, contact=receiver)
+        serializer.save(user=sender, type=Transaction.MADE, wallet_id=sender_wallet.id, email=receiver)
 
         # # Transactions RECEIVED
-        Transaction.objects.create(user_id=receiver.id, type=Transaction.RECEIVED, value=value, contact=sender,
+        Transaction.objects.create(user_id=receiver.id, type=Transaction.RECEIVED, value=value, email=sender,
                                    wallet=receiver_wallet)
 
     def post(self, request, *args, **kwargs):
