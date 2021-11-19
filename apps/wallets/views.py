@@ -74,7 +74,8 @@ class SeriesView(APIView):
             for key, value in query.items():
                 if key == 'date':
                     data[key].append(value)
-                data[key].append(currency_converter.converted_amount(value))
+                else:
+                    data[key].append(currency_converter.converted_amount(value))
 
         serializer = SeriesSerializer(instance=data)
         return Response(data=serializer.data)
