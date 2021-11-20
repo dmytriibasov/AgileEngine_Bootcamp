@@ -1,10 +1,7 @@
 import pytest
 from fixtures import user_data, setup_user
-
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
-
-
 from apps.users.models import User
 
 

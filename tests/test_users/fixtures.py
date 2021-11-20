@@ -1,9 +1,6 @@
 import pytest
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
-from apps.users.models import User
-from rest_framework.test import APIRequestFactory
-
 client = APIClient()
 
 
@@ -24,5 +21,3 @@ def user_data():
 def setup_user(user_data):
     user = client.post(reverse('users:signup'), data=user_data)
     return user
-
-
