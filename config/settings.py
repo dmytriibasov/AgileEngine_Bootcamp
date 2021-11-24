@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='secret_key228')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default='3rii*pu2!k35ai)0iqgf+#ycnsz97pmsm&k*031&s@w^-7i^!v')
 
 # Currency exchange API settings
 CURRENCY_EXCHANGE_APP_ID = os.getenv('OPEN_EXCHANGE_RATE_API_ID')
@@ -32,7 +32,7 @@ CURRENCY_EXCHANGE_URL = 'https://openexchangerates.org/api/latest.json'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = os.getenv('DEBUG', default='false').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
@@ -104,13 +104,6 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT'),
-        # 'TEST': {
-        #     'HOST': 'localhost',
-        #     'PORT': 5432,
-        #     'NAME': 'api_wallet_test_db',
-        #     'USER': 'api_wallet',
-        #     'PASSWORD': 'api_wallet'
-        # }
     }
 }
 
@@ -175,7 +168,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
 
 
