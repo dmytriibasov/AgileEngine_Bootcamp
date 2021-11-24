@@ -1,9 +1,9 @@
 import datetime
 from django.db.models import F
-from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
-
-from .mixins import CreateModelTransactionMixin
+from django.db import transaction
 from .models import Transaction
 from .serializers import FillTransactionSerializer, WithdrawTransactionSerializer, PayTransactionSerializer,\
     TransactionSerializer
@@ -12,37 +12,36 @@ from ..wallets.models import Wallet
 
 
 # Create your views here.
-class FillTransactionView(CreateModelTransactionMixin, GenericAPIView):
+class FillTransactionView(CreateAPIView):
+
     permission_classes = (IsAuthenticated,)
     serializer_class = FillTransactionSerializer
 
     def perform_create(self, serializer):
-        wallet_id = self.request.user.id  # TEMPORARY HARDCODED wallet_id == user_id !! TO BE CHANGED
-        wallet = Wallet.objects.get(id=wallet_id)
-        wallet.balance = F('balance') + serializer.validated_data.get('value', 0)
-        serializer.save(user=self.request.user, type=Transaction.FILL, wallet_id=wallet_id)
-        wallet.save(update_fields=['balance'])
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        with transaction.atomic():
+            wallet_id = self.request.user.id  # TEMPORARY HARDCODED wallet_id == user_id !! TO BE CHANGED
+            wallet = Wallet.objects.get(id=wallet_id)
+            wallet.balance = F('balance') + serializer.validated_data.get('value', 0)
+            serializer.save(user=self.request.user, type=Transaction.FILL, wallet_id=wallet_id)
+            wallet.save(update_fields=['balance'])
 
 
-class WithdrawTransactionView(CreateModelTransactionMixin, GenericAPIView):
+class WithdrawTransactionView(CreateAPIView):
+
     permission_classes = (IsAuthenticated,)
     serializer_class = WithdrawTransactionSerializer
 
     def perform_create(self, serializer):
-        wallet_id = self.request.user.id  # TEMPORARY HARDCODED wallet_id == user_id !! TO BE CHANGED
-        wallet = Wallet.objects.get(id=wallet_id)
-        wallet.balance = F('balance') - serializer.validated_data.get('value', 0)
-        serializer.save(user=self.request.user, type=Transaction.WITHDRAW, wallet_id=wallet_id)
-        wallet.save(update_fields=['balance'])
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        with transaction.atomic():
+            wallet_id = self.request.user.id  # TEMPORARY HARDCODED wallet_id == user_id !! TO BE CHANGED
+            wallet = Wallet.objects.get(id=wallet_id)
+            wallet.balance = F('balance') - serializer.validated_data.get('value', 0)
+            serializer.save(user=self.request.user, type=Transaction.WITHDRAW, wallet_id=wallet_id)
+            wallet.save(update_fields=['balance'])
 
 
-class PayTransactionView(CreateModelTransactionMixin, GenericAPIView):
+class PayTransactionView(CreateAPIView):
+
     permission_classes = (IsAuthenticated,)
     serializer_class = PayTransactionSerializer
 
@@ -54,30 +53,32 @@ class PayTransactionView(CreateModelTransactionMixin, GenericAPIView):
         sender = self.request.user
         receiver = User.objects.get(email=serializer.validated_data.get('email'))
 
-        # Sender wallet
+        # Wallets for Sender & Receiver
         sender_wallet = Wallet.objects.get(id=sender.id)  # TEMPORARY HARDCODED wallet_id == user_id !! TO BE CHANGED
-        sender_wallet.balance = F('balance') - value
-        sender_wallet.save(update_fields=['balance'])
-
-        # Receiver wallet
         receiver_wallet = Wallet.objects.get(id=receiver.id)  # TEMPORARY HARDCODED wallet_id == user_id!! TO BE CHANGED
-        receiver_wallet.balance = F('balance') + value
-        receiver_wallet.save(update_fields=['balance'])
 
-        # Transaction MADE
-        serializer.save(user=sender, type=Transaction.MADE, wallet_id=sender_wallet.id, email=receiver)
+        with transaction.atomic():
 
-        # # Transactions RECEIVED
-        Transaction.objects.create(user_id=receiver.id, type=Transaction.RECEIVED, value=value, email=sender,
-                                   wallet=receiver_wallet)
+            # Update sender wallet balance
+            sender_wallet.balance = F('balance') - value
+            sender_wallet.save(update_fields=['balance'])
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+            # Update receiver wallet balance
+            receiver_wallet.balance = F('balance') + value
+            receiver_wallet.save(update_fields=['balance'])
+
+            # Transaction MADE
+            serializer.save(user=sender, type=Transaction.MADE, wallet_id=sender_wallet.id, email=receiver)
+
+            # # Transactions RECEIVED
+            Transaction.objects.create(user_id=receiver.id, type=Transaction.RECEIVED, value=value, email=sender,
+                                       wallet=receiver_wallet)
 
 
 class TransactionsListView(ListAPIView):
 
     permission_classes = (IsAuthenticated,)
+    pagination_class = LimitOffsetPagination
     serializer_class = TransactionSerializer
 
     def get_queryset(self):
