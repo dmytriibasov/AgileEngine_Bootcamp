@@ -9,6 +9,8 @@ services:
       - POSTGRES_DB=api_wallet
       - POSTGRES_USER=api_wallet
       - POSTGRES_PASSWORD=api_wallet
+      - DB_HOST=db
+        DB_PORT=5432
       - OPEN_EXCHANGE_RATE_API_ID=460c5586fcad4fa7ac527007d31eebba
     ports:
       - "8001:5432"
