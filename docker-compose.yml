@@ -4,11 +4,12 @@ services:
   db:
     image: postgres:14
     volumes:
-      - ../data/db:/var/lib/postgresql/data
+      - database:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=api_wallet
       - POSTGRES_USER=api_wallet
       - POSTGRES_PASSWORD=api_wallet
+      - OPEN_EXCHANGE_RATE_API_ID=460c5586fcad4fa7ac527007d31eebba
     ports:
       - "8001:5432"
 
@@ -26,6 +27,10 @@ services:
     restart: always
     image: redis:6.2.6
     volumes:
-      - ../data/redis:/.data:rw
+      - redis:/.data:rw
     ports:
       - "6380:6379"
+
+volumes:
+  database:
+  redis:
